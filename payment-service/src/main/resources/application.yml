@@ -1,0 +1,9 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: payment-service
+
+# booking service base url used by payment to notify booking about payment
+  booking:
+    base-url: http://localhost:8084

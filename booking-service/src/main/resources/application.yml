@@ -1,0 +1,13 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: booking-service
+
+downstream:
+  user-base-url: http://localhost:8081
+  flight-base-url: http://localhost:8082
+  hotel-base-url: http://localhost:8083
+  notification-base-url: http://localhost:8086
+  payment-base-url: http://localhost:8085
