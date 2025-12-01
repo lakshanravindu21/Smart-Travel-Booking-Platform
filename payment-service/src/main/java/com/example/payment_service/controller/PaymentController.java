@@ -24,7 +24,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> getPayment(@PathVariable Long id) {
+    public ResponseEntity<Payment> getPayment(@PathVariable("id") Long id) {
         Payment payment = paymentService.getPayment(id);
         return ResponseEntity.ok(payment);
     }

@@ -22,8 +22,13 @@ public class HotelController {
         return hotelService.getAllHotels();
     }
 
+    @GetMapping("/{id}")
+    public Hotel getHotelById(@PathVariable("id") Long id) {
+        return hotelService.getHotelById(id);
+    }
+
     @GetMapping("/{id}/availability")
-    public HotelAvailabilityDTO getAvailability(@PathVariable Long id) {
+    public HotelAvailabilityDTO getAvailability(@PathVariable("id") Long id) {
         return hotelService.checkAvailability(id);
     }
 

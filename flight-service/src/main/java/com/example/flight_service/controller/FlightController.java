@@ -22,8 +22,13 @@ public class FlightController {
         return flightService.getAllFlights();
     }
 
+    @GetMapping("/{id}")
+    public Flight getFlightById(@PathVariable("id") Long id) {
+        return flightService.getFlightById(id);
+    }
+
     @GetMapping("/{id}/availability")
-    public FlightAvailabilityDTO getAvailability(@PathVariable Long id) {
+    public FlightAvailabilityDTO getAvailability(@PathVariable("id") Long id) {
         return flightService.checkAvailability(id);
     }
 

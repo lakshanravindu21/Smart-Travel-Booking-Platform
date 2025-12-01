@@ -12,31 +12,41 @@ import java.util.List;
 public class BookingController {
 
     private final BookingRepository repo;
-    public BookingController(BookingRepository repo) { this.repo = repo; }
+
+    public BookingController(BookingRepository repo) {
+        this.repo = repo;
+    }
 
     @GetMapping
-    public List<Booking> all() { return repo.findAll(); }
+    public List<Booking> getAllBookings() {
+        return repo.findAll();
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getById(@PathVariable Long id) {
-        return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Booking> getBookingById(@PathVariable("id") Long id) {
+        return repo.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Booking create(@RequestBody Booking b) {
-        // in the real orchestrator you would set PENDING and later update
-        b.setStatus(Booking.Status.PENDING);
-        return repo.save(b);
+    public Booking createBooking(@RequestBody Booking booking) {
+        booking.setStatus(Booking.Status.PENDING);
+        return repo.save(booking);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Booking> update(@PathVariable Long id, @RequestBody Booking update) {
-        return repo.findById(id).map(b -> {
-            // copy fields you need
-            b.setStatus(update.getStatus());
-            b.setTotalCost(update.getTotalCost());
-            Booking saved = repo.save(b);
+    public ResponseEntity<Booking> updateBooking(@PathVariable("id") Long id,
+                                                 @RequestBody Booking update) {
+
+        return repo.findById(id).map(existing -> {
+
+            existing.setStatus(update.getStatus());
+            existing.setTotalCost(update.getTotalCost());
+
+            Booking saved = repo.save(existing);
             return ResponseEntity.ok(saved);
+
         }).orElse(ResponseEntity.notFound().build());
     }
 }
