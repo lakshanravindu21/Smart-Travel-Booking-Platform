@@ -2,6 +2,8 @@ package com.example.booking_service.controller;
 
 import com.example.booking_service.model.Booking;
 import com.example.booking_service.repository.BookingRepository;
+import com.example.booking_service.dto.BookingRequestDTO;
+import com.example.booking_service.service.BookingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,42 +13,24 @@ import java.util.List;
 @RequestMapping("/api/bookings")
 public class BookingController {
 
-    private final BookingRepository repo;
+    private final BookingService bookingService;
 
-    public BookingController(BookingRepository repo) {
-        this.repo = repo;
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
     }
 
     @GetMapping
     public List<Booking> getAllBookings() {
-        return repo.findAll();
+        return bookingService.getAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getBookingById(@PathVariable("id") Long id) {
-        return repo.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Booking> getBooking(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.getBooking(id));
     }
 
     @PostMapping
-    public Booking createBooking(@RequestBody Booking booking) {
-        booking.setStatus(Booking.Status.PENDING);
-        return repo.save(booking);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Booking> updateBooking(@PathVariable("id") Long id,
-                                                 @RequestBody Booking update) {
-
-        return repo.findById(id).map(existing -> {
-
-            existing.setStatus(update.getStatus());
-            existing.setTotalCost(update.getTotalCost());
-
-            Booking saved = repo.save(existing);
-            return ResponseEntity.ok(saved);
-
-        }).orElse(ResponseEntity.notFound().build());
+    public Booking createBooking(@RequestBody BookingRequestDTO req) {
+        return bookingService.createBooking(req);
     }
 }
