@@ -1,8 +1,8 @@
 package com.example.flight_service.controller;
 
+import com.example.flight_service.dto.FlightAvailabilityDTO;
 import com.example.flight_service.model.Flight;
-import com.example.flight_service.repository.FlightRepository;
-import org.springframework.http.ResponseEntity;
+import com.example.flight_service.service.FlightService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,26 +11,24 @@ import java.util.List;
 @RequestMapping("/api/flights")
 public class FlightController {
 
-    private final FlightRepository repo;
-    public FlightController(FlightRepository repo) { this.repo = repo; }
+    private final FlightService flightService;
+
+    public FlightController(FlightService flightService) {
+        this.flightService = flightService;
+    }
 
     @GetMapping
-    public List<Flight> all() { return repo.findAll(); }
+    public List<Flight> getAllFlights() {
+        return flightService.getAllFlights();
+    }
 
     @GetMapping("/{id}/availability")
-    public ResponseEntity<?> availability(@PathVariable Long id) {
-        return repo.findById(id)
-                .map(f -> ResponseEntity.ok(new FlightAvailabilityDTO(f.isAvailable(), f.getPrice())))
-                .orElse(ResponseEntity.notFound().build());
+    public FlightAvailabilityDTO getAvailability(@PathVariable Long id) {
+        return flightService.checkAvailability(id);
     }
 
     @PostMapping
-    public Flight create(@RequestBody Flight f) { return repo.save(f); }
-
-    // small DTO class
-    public static class FlightAvailabilityDTO {
-        public boolean available;
-        public Double price;
-        public FlightAvailabilityDTO(boolean available, Double price) { this.available = available; this.price = price; }
+    public Flight createFlight(@RequestBody Flight flight) {
+        return flightService.createFlight(flight);
     }
 }

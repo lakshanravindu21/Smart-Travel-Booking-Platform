@@ -1,37 +1,31 @@
 package com.example.payment_service.controller;
 
+import com.example.payment_service.dto.PaymentRequestDTO;
+import com.example.payment_service.dto.PaymentResponseDTO;
 import com.example.payment_service.model.Payment;
-import com.example.payment_service.repository.PaymentRepository;
+import com.example.payment_service.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
 
-    private final PaymentRepository repo;
-    private final WebClient webClient = WebClient.create();
+    private final PaymentService paymentService;
 
-    public PaymentController(PaymentRepository repo) { this.repo = repo; }
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 
     @PostMapping
-    public ResponseEntity<Payment> createPayment(@RequestBody Payment p) {
-        p.setStatus("SUCCESS"); // or simulate failure
-        Payment saved = repo.save(p);
+    public ResponseEntity<PaymentResponseDTO> createPayment(@RequestBody PaymentRequestDTO dto) {
+        PaymentResponseDTO resp = paymentService.processPayment(dto);
+        return ResponseEntity.ok(resp);
+    }
 
-        // callback to booking service (WebClient)
-        try {
-            webClient.post()
-                .uri("http://localhost:8084/api/bookings/" + saved.getBookingId() + "/payment-callback")
-                .bodyValue(saved)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .subscribe();
-        } catch (Exception ex) {
-            // log but don't fail payment save
-        }
-
-        return ResponseEntity.ok(saved);
+    @GetMapping("/{id}")
+    public ResponseEntity<Payment> getPayment(@PathVariable Long id) {
+        Payment payment = paymentService.getPayment(id);
+        return ResponseEntity.ok(payment);
     }
 }

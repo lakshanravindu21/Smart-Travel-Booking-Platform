@@ -1,7 +1,8 @@
 package com.example.notification_service.controller;
 
+import com.example.notification_service.dto.NotificationRequestDTO;
 import com.example.notification_service.model.NotificationEntry;
-import com.example.notification_service.repository.NotificationRepository;
+import com.example.notification_service.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,14 +10,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/notifications")
 public class NotificationController {
 
-    private final NotificationRepository repo;
-    public NotificationController(NotificationRepository repo) { this.repo = repo; }
+    private final NotificationService notificationService;
+
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @PostMapping
-    public ResponseEntity<NotificationEntry> send(@RequestBody NotificationEntry n) {
-        NotificationEntry saved = repo.save(n);
-        // Optionally simulate sending email by logging / printing to console
-        System.out.println("Notification queued: " + saved.getMessage());
+    public ResponseEntity<NotificationEntry> send(@RequestBody NotificationRequestDTO dto) {
+        NotificationEntry saved = notificationService.sendNotification(dto);
         return ResponseEntity.ok(saved);
     }
 }

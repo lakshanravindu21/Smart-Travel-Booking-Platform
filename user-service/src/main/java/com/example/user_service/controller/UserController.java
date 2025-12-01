@@ -1,8 +1,7 @@
 package com.example.user_service.controller;
 
-import com.example.user_service.model.User;
-import com.example.user_service.repository.UserRepository;
-import org.springframework.http.ResponseEntity;
+import com.example.user_service.dto.UserDTO;
+import com.example.user_service.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,17 +10,27 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserRepository repo;
-    public UserController(UserRepository repo) { this.repo = repo; }
+    private final UserService userService;
 
-    @GetMapping
-    public List<User> all() { return repo.findAll(); }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable Long id) {
-        return repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
+    // Get all users
+    @GetMapping
+    public List<UserDTO> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    // Get user by id
+    @GetMapping("/{id}")
+    public UserDTO getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    // Create a new user
     @PostMapping
-    public User create(@RequestBody User u) { return repo.save(u); }
+    public UserDTO createUser(@RequestBody UserDTO userDTO) {
+        return userService.createUser(userDTO);
+    }
 }

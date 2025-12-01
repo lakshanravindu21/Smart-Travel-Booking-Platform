@@ -3,6 +3,8 @@ package com.example.booking_service.service;
 import com.example.booking_service.clients.FlightClient;
 import com.example.booking_service.clients.HotelClient;
 import com.example.booking_service.dto.*;
+import com.example.booking_service.exception.PaymentFailedException;
+import com.example.booking_service.exception.ResourceNotFoundException;
 import com.example.booking_service.model.Booking;
 import com.example.booking_service.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,15 +49,15 @@ public class BookingService {
                 .retrieve()
                 .bodyToMono(UserDTO.class)
                 .block();
-        if (user == null) throw new RuntimeException("User not found");
+        if (user == null) throw new ResourceNotFoundException("User not found with ID: " + req.getUserId());
 
         // 2. check flight availability
         FlightAvailabilityDTO f = flightClient.checkAvailability(req.getFlightId());
-        if (f == null || !f.isAvailable()) throw new RuntimeException("Flight not available");
+        if (f == null || !f.isAvailable()) throw new ResourceNotFoundException("Flight not available");
 
         // 3. check hotel availability
         HotelAvailabilityDTO h = hotelClient.checkAvailability(req.getHotelId());
-        if (h == null || !h.isAvailable()) throw new RuntimeException("Hotel not available");
+        if (h == null || !h.isAvailable()) throw new ResourceNotFoundException("Hotel not available");
 
         // 4. calculate total price
         double total = f.getPrice() + h.getPrice();
@@ -83,13 +85,12 @@ public class BookingService {
         if (payResp == null || !payResp.isSuccess()) {
             booking.setStatus(Booking.Status.FAILED);
             bookingRepository.save(booking);
-            throw new RuntimeException("Payment failed");
+            throw new PaymentFailedException("Payment failed for booking ID: " + booking.getId());
         }
 
         // 7. send notification (ignore failure)
         NotificationRequestDTO notif =
                 new NotificationRequestDTO(req.getUserId(), "Booking confirmed: " + booking.getId());
-
         try {
             webClient.post()
                     .uri(notificationBaseUrl + "/api/notifications/send")
@@ -106,7 +107,9 @@ public class BookingService {
     }
 
     public Booking getBooking(Long id) {
-        return bookingRepository.findById(id).orElse(null);
+        return bookingRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Booking not found with ID: " + id)
+        );
     }
 
     public List<Booking> getAll() {
@@ -114,10 +117,9 @@ public class BookingService {
     }
 
     public void markPaid(Long bookingId) {
-        Booking b = bookingRepository.findById(bookingId).orElse(null);
-        if (b != null) {
-            b.setStatus(Booking.Status.CONFIRMED);
-            bookingRepository.save(b);
-        }
+        Booking b = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + bookingId));
+        b.setStatus(Booking.Status.CONFIRMED);
+        bookingRepository.save(b);
     }
 }
