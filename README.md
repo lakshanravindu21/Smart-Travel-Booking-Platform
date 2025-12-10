@@ -163,7 +163,7 @@ mvn spring-boot:run
 
 ## 🌐 8. Inter-Service Communication Flow (Assignment Required)
 
-| From                   | To        | 
+| From                   | To        |
 | ---------------------- | --------- | 
 | Booking → User         | WebClient |            
 | Booking → Flight       | Feign     |            
@@ -195,12 +195,16 @@ mvn spring-boot:run
 ### ✅ Step 5: Cost calculation
 
 ### ✅ Step 6: Booking saved as PENDING
+	When a booking is first created, the status is set to PENDING.
 
 ### ✅ Step 7: Payment processed (WebClient)
+	Payment Service handles the payment and calls the payment callback endpoint in the Booking Service.
 
-### ✅ Step 8: Notification sent (WebClient)
-
-### ✅ Step 9: Booking updated to CONFIRMED
+### ✅ Step 8: Booking updated to CONFIRMED
+	The Booking Service updates the booking status from PENDING → CONFIRMED.
+	If payment fails, the status will be updated to FAILED.
+	
+### ✅ Step 9: Notification sent (WebClient)
 
 ---
 
@@ -279,4 +283,3 @@ GitHub: https://github.com/lakshanravindu21/Smart-Travel-Booking-Platform.git
 ---
 
 ✅ **End of README**
-
