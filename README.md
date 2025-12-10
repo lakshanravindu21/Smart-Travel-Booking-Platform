@@ -163,13 +163,13 @@ mvn spring-boot:run
 
 ## 🌐 8. Inter-Service Communication Flow (Assignment Required)
 
-| From                   | To        | Technology |
-| ---------------------- | --------- | ---------- |
-| Booking → User         | WebClient |            |
-| Booking → Flight       | Feign     |            |
-| Booking → Hotel        | Feign     |            |
-| Booking → Payment      | WebClient |            |
-| Booking → Notification | WebClient |            |
+| From                   | To        | 
+| ---------------------- | --------- | 
+| Booking → User         | WebClient |            
+| Booking → Flight       | Feign     |            
+| Booking → Hotel        | Feign     |            
+| Booking → Payment      | WebClient |            
+| Booking → Notification | WebClient |            
 
 ---
 
@@ -279,3 +279,4 @@ GitHub: https://github.com/lakshanravindu21/Smart-Travel-Booking-Platform.git
 ---
 
 ✅ **End of README**
+
